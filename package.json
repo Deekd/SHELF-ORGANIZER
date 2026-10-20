@@ -1,0 +1,10 @@
+{
+  "name": "shelf-inventory",
+  "version": "1.0.0",
+  "description": "A lightweight, no-account inventory tracker for clubs, teams, and food pantries.",
+  "scripts": {
+    "test": "node test/core.test.js",
+    "start": "python3 -m http.server 8000"
+  },
+  "license": "MIT"
+}

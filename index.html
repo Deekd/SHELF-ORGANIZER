@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shelf – simple inventory for clubs, teams and food pantries</title>
+  <meta name="description" content="A free, lightweight inventory tracker that runs in your browser. No account, no server.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23216e5b'/%3E%3Cpath d='M14 22h36M14 34h36M14 46h36' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#list">Skip to inventory</a>
+
+  <header class="top">
+    <div class="wrap top-row">
+      <div class="brand">
+        <label class="sr" for="orgName">Organization name</label>
+        <input id="orgName" class="org" type="text" maxlength="60" placeholder="Your organization" autocomplete="off">
+        <p class="tag">Inventory</p>
+      </div>
+      <div class="top-actions">
+        <label class="who">
+          <span class="sr">Your name (recorded in history)</span>
+          <input id="who" type="text" maxlength="40" placeholder="Your name" autocomplete="name">
+        </label>
+        <button id="addBtn" class="btn primary" type="button">+ Add item</button>
+        <details class="menu" id="menu">
+          <summary class="btn" aria-label="More actions">More ▾</summary>
+          <div class="menu-pop" role="menu">
+            <button type="button" role="menuitem" id="historyBtn">History</button>
+            <button type="button" role="menuitem" id="exportCsvBtn">Export CSV</button>
+            <button type="button" role="menuitem" id="backupBtn">Download backup (JSON)</button>
+            <button type="button" role="menuitem" id="importBtn">Import CSV / backup…</button>
+            <button type="button" role="menuitem" id="printBtn">Print</button>
+            <button type="button" role="menuitem" id="clearBtn" class="danger">Delete everything…</button>
+          </div>
+        </details>
+        <input id="importFile" type="file" accept=".csv,.json,text/csv,application/json" hidden>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="stats" aria-label="Summary" id="stats"></section>
+
+    <section class="controls" aria-label="Filters">
+      <label class="sr" for="search">Search items</label>
+      <input id="search" type="search" placeholder="Search name, category, location…" autocomplete="off">
+
+      <label class="sr" for="category">Category</label>
+      <select id="category"><option value="">All categories</option></select>
+
+      <label class="sr" for="sort">Sort by</label>
+      <select id="sort">
+        <option value="name">Sort: Name</option>
+        <option value="qty">Sort: Fewest first</option>
+        <option value="category">Sort: Category</option>
+        <option value="expires">Sort: Expiring soonest</option>
+        <option value="updated">Sort: Recently changed</option>
+      </select>
+
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" data-view="all" aria-pressed="true">All</button>
+        <button type="button" data-view="low" aria-pressed="false">Low / out</button>
+        <button type="button" data-view="expiring" aria-pressed="false">Expiring</button>
+      </div>
+    </section>
+
+    <ul id="list" class="list" aria-live="polite"></ul>
+    <div id="empty" class="empty" hidden></div>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Your data is stored only in this browser. Use <strong>More → Download backup</strong> regularly, and to move to another device.</p>
+  </footer>
+
+  <!-- Add / edit item -->
+  <dialog id="itemDialog" aria-labelledby="itemTitle">
+    <form id="itemForm" method="dialog" novalidate>
+      <h2 id="itemTitle">Add item</h2>
+      <div class="grid">
+        <label class="full">Name
+          <input name="name" type="text" required maxlength="120" autocomplete="off">
+        </label>
+        <label>Category
+          <input name="category" type="text" maxlength="60" list="categoryList" autocomplete="off" placeholder="e.g. Canned goods">
+          <datalist id="categoryList"></datalist>
+        </label>
+        <label>Location
+          <input name="location" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Shelf A1">
+        </label>
+        <label>Quantity
+          <input name="qty" type="number" min="0" step="1" value="0" inputmode="numeric">
+        </label>
+        <label>Unit
+          <input name="unit" type="text" maxlength="20" autocomplete="off" placeholder="cans, jerseys, boxes…">
+        </label>
+        <label>Alert when at or below
+          <input name="min" type="number" min="0" step="1" value="0" inputmode="numeric">
+          <small>0 turns the low-stock alert off.</small>
+        </label>
+        <label>Expires / best by
+          <input name="expires" type="date">
+        </label>
+        <label class="full">Notes
+          <textarea name="notes" rows="2" maxlength="500"></textarea>
+        </label>
+      </div>
+      <p id="formError" class="error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn danger-text" id="deleteBtn" hidden>Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- History -->
+  <dialog id="historyDialog" aria-labelledby="historyTitle">
+    <div class="dialog-head">
+      <h2 id="historyTitle">History</h2>
+      <button type="button" class="btn" id="historyClose">Close</button>
+    </div>
+    <ul id="historyList" class="history"></ul>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <noscript><p class="wrap">This app needs JavaScript to run.</p></noscript>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
